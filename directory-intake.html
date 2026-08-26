@@ -161,7 +161,7 @@
 
   function botSay(t){const d=document.createElement('div');d.className='msg bot';d.textContent=t;log.appendChild(d);scrollDown();}
   function meSay(t){const d=document.createElement('div');d.className='msg me';d.textContent=t;log.appendChild(d);scrollDown();}
-  function scrollDown(){requestAnimationFrame(()=>log.lastChild&&log.lastChild.scrollIntoView({behavior:'smooth',block:'end'}));}
+  function scrollDown(){requestAnimationFrame(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'}));}
   function setBar(){bar.style.width=Math.round((step/steps.length)*100)+'%';}
 
   let multiSel=[];
@@ -197,18 +197,14 @@
       chips.appendChild(done);
     } else if(s.type==='category'){
       input.style.display='none';send.style.display='none';
-      const list=document.createElement('div');list.className='catlist';
       CATS.forEach(c=>{
-        const b=document.createElement('button');b.className='catrow';b.type='button';b.setAttribute('aria-pressed','false');
-        b.innerHTML='<span class="cn"></span><span class="ch"></span>';
-        b.querySelector('.cn').textContent=c.name;
-        b.querySelector('.ch').textContent=c.hint;
+        const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=c.name;b.setAttribute('aria-pressed','false');
         b.onclick=()=>{const i=multiSel.indexOf(c.name);
           if(i>-1){multiSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}
-          else{multiSel.push(c.name);b.classList.add('on');b.setAttribute('aria-pressed','true');}};
-        list.appendChild(b);
+          else{multiSel.push(c.name);b.classList.add('on');b.setAttribute('aria-pressed','true');}
+          hint.textContent=c.hint;};
+        chips.appendChild(b);
       });
-      chips.appendChild(list);
       const done=document.createElement('button');done.className='chip-done';done.type='button';done.textContent='Done';
       done.onclick=()=>{
         if(!multiSel.length){err.textContent="Pick at least one category.";return;}
@@ -267,7 +263,7 @@
     };
     const finishUI=()=>{
       const c=document.createElement('div');c.className='done-card';
-      c.innerHTML='<h2>You\u2019re in the queue \u2705</h2><p style="color:var(--muted);font-size:14px;margin:0 0 14px">Kimberly reviews new listings and adds them once approved. You\u2019ll see it live on the directory soon.</p><a class="chip-done" style="display:inline-block;text-decoration:none" href="directory.html">Back to the directory</a>';
+      c.innerHTML='<h2>You\u2019re in the queue \u2705</h2><p style="color:var(--muted);font-size:14px;margin:0 0 14px">Need Greater Success reviews new listings and adds them once approved. You\u2019ll see it live on the directory soon.</p><a class="chip-done" style="display:inline-block;text-decoration:none" href="directory.html">Back to the directory</a>';
       log.appendChild(c);scrollDown();
     };
     if(!API_URL){ botSay("(Preview mode — no endpoint set yet, so nothing was sent.)"); finishUI(); return; }

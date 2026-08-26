@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List your business — The Friends Directory</title>
+<meta name="description" content="Add your business to The Friends Directory. A short, friendly intake — no forms, just a few questions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#080b0f;--card:#111820;--card-alt:#141d28;--border:#1a2535;--border-strong:#243040;
+    --teal:#2abfbf;--teal-alt:#1a9fcc;--teal-dim:rgba(42,191,191,.12);
+    --gold:#f0a94a;--coral:#e85d5d;--text:#f0f6ff;--muted:#8794aa;--grid:rgba(42,191,191,.03);
+  }
+  *{box-sizing:border-box}
+  html{background:var(--page)!important;color-scheme:dark}
+  body{margin:0;background:var(--page)!important;color:var(--text)!important;
+       font-family:'DM Sans',system-ui,sans-serif;font-weight:400;line-height:1.6;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:48px 48px}
+  .shell{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:0 18px;min-height:100vh;display:flex;flex-direction:column}
+  a{color:var(--teal);text-decoration:none}
+  .label{font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--muted)}
+  h1{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;margin:0;letter-spacing:-.01em}
+
+  header{padding:26px 0 18px;border-bottom:1px solid var(--border)}
+  .status{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,191,191,.5)}70%{box-shadow:0 0 0 9px rgba(42,191,191,0)}100%{box-shadow:0 0 0 0 rgba(42,191,191,0)}}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px}
+
+  .log{flex:1;padding:22px 0 12px;display:flex;flex-direction:column;gap:14px}
+  .msg{max-width:86%;padding:12px 16px;border-radius:14px;font-size:15px;animation:rise .25s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .bot{align-self:flex-start;background:var(--card);border:1px solid var(--border);border-top-left-radius:4px}
+  .me{align-self:flex-end;background:var(--teal-dim);border:1px solid rgba(42,191,191,.4);color:var(--text);border-top-right-radius:4px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 6px}
+  .chip{font-family:'DM Sans';font-weight:500;font-size:13.5px;padding:9px 15px;border-radius:22px;
+        background:var(--card-alt);color:var(--text);border:1px solid var(--border-strong);cursor:pointer}
+  .chip:hover{border-color:var(--teal)}
+  .chip.on{background:var(--teal);color:#04211f;border-color:var(--teal)}
+  .chip-done{font-family:'DM Sans';font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:22px;
+             background:var(--gold);color:#3a2708;border:none;cursor:pointer}
+
+  .composer{position:sticky;bottom:0;background:linear-gradient(transparent,var(--page) 22%);
+            padding:14px 0 22px;display:flex;flex-direction:column;gap:6px}
+  .row{display:flex;gap:10px}
+  textarea{flex:1;resize:none;background:var(--card);color:var(--text);border:1px solid var(--border-strong);
+           border-radius:12px;padding:13px 14px;font-family:'DM Sans';font-size:15px;min-height:48px;max-height:140px}
+  textarea:focus,.chip:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .send{background:var(--teal);color:#04211f;border:none;border-radius:12px;padding:0 20px;
+        font-family:'DM Sans';font-weight:600;font-size:15px;cursor:pointer}
+  .send:disabled{opacity:.4;cursor:not-allowed}
+  .err{color:var(--coral);font-size:13px;min-height:1px}
+  .hint{color:var(--muted);font-size:12px}
+  .progress{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:2px}
+  .progress > i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+
+  .done-card{align-self:stretch;background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:22px;text-align:center}
+  .done-card h2{font-family:'Syne';font-weight:800;font-size:20px;margin:0 0 8px}
+  @media (prefers-reduced-motion:reduce){.dot{animation:none}.msg{animation:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <span class="status"><span class="dot" aria-hidden="true"></span><span class="label">Intake · The Friends Directory</span></span>
+    <h1>Let's get you listed</h1>
+    <p class="sub">A few quick questions — answer by tapping or typing. Takes about two minutes.</p>
+    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  </header>
+
+  <main id="log" class="log" role="log" aria-live="polite" aria-label="Conversation"></main>
+
+  <div class="composer">
+    <div class="chips" id="chips"></div>
+    <div class="err" id="err" role="alert"></div>
+    <div class="row">
+      <label class="label" for="input" style="position:absolute;left:-9999px">Your answer</label>
+      <textarea id="input" rows="1" placeholder="Type your answer…" autocomplete="off"></textarea>
+      <button class="send" id="send">Send</button>
+    </div>
+    <span class="hint" id="hint"></span>
+  </div>
+</div>
+
+<script>
+  // ── Paste your Apps Script Web App URL here (the /exec link). ──
+  const API_URL = "https://script.google.com/macros/s/AKfycbxxohDflp4MZ0-3hcNW9o5JPemJaYBVt9jP0CK12j3LIsaPhV0PgUO8kqdR_lA2Bplf/exec";
+
+  const CATEGORIES = [
+    "Home & Trades","Beauty & Wellness","Health & Wellness","Food & Catering",
+    "Professional Services","Tech & Digital","Creative & Media","Retail & E-commerce",
+    "Real Estate & Lodging","Auto & Transport","Education & Coaching"
+  ];
+
+  const log=document.getElementById('log'), chips=document.getElementById('chips'),
+        input=document.getElementById('input'), send=document.getElementById('send'),
+        err=document.getElementById('err'), hint=document.getElementById('hint'), bar=document.getElementById('bar');
+
+  const data={};
+  let step=0;
+
+  // Each step: prompt, key, type, options, validate, optional
+  const steps=[
+    {key:'business',type:'text',prompt:"First up — what's your business called?",
+     validate:v=>v.length>=2||"Please enter your business name."},
+    {key:'owner',type:'text',prompt:"And who runs it — your name or the contact person?",
+     validate:v=>v.length>=2||"Please enter a name."},
+    {key:'category',type:'single',prompt:"Which category fits best?",options:CATEGORIES},
+    {key:'city',type:'text',prompt:"What city are you in?",validate:v=>v.length>=2||"Please enter a city."},
+    {key:'country',type:'text',prompt:"And which country?",validate:v=>v.length>=2||"Please enter a country."},
+    {key:'serves',type:'single',prompt:"Who do you serve?",options:["Local","Online","Both"],
+     hint:"Local = customers near you · Online = anywhere · Both = a mix."},
+    {key:'languages',type:'multi',prompt:"Which languages can guests reach you in? Pick all that apply.",
+     options:["English","Spanish","ASL","Other"],hint:"Tap all that apply, then tap Done. ASL is welcome here."},
+    {key:'website',type:'text',prompt:"Do you have a website? Paste the link — or type \u201cnone\u201d if not yet.",
+     transform:v=>/^none$/i.test(v.trim())?"":v.trim()},
+    {key:'referredBy',type:'text',prompt:"Last community question: which friend referred you in?",
+     validate:v=>v.length>=2||"A referral keeps this directory just for the friends.",
+     hint:"Their name helps us keep it by the friends, for the friends."},
+    {key:'description',type:'text',prompt:"Finally — describe your business in a sentence or two.",
+     validate:v=>v.length>=10||"A little more detail helps guests understand what you offer.",
+     hint:"This shows on your listing card."},
+    {key:'contact',type:'text',prompt:"How should guests reach you? (email, WhatsApp, or \u201cvia my site\u201d)",
+     optional:true}
+  ];
+
+  function botSay(t){const d=document.createElement('div');d.className='msg bot';d.textContent=t;log.appendChild(d);scroll();}
+  function meSay(t){const d=document.createElement('div');d.className='msg me';d.textContent=t;log.appendChild(d);scroll();}
+  function scroll(){requestAnimationFrame(()=>log.lastChild&&log.lastChild.scrollIntoView({behavior:'smooth',block:'end'}));}
+  function setBar(){bar.style.width=Math.round((step/steps.length)*100)+'%';}
+
+  let multiSel=[];
+  function ask(){
+    err.textContent='';chips.innerHTML='';hint.textContent='';multiSel=[];
+    if(step>=steps.length){return finish();}
+    const s=steps[step];
+    botSay(s.prompt);
+    hint.textContent=s.hint||'';
+    setBar();
+
+    if(s.type==='single'){
+      input.style.display='none';send.style.display='none';
+      s.options.forEach(o=>{
+        const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=o;
+        b.onclick=()=>{meSay(o);data[s.key]=o;step++;next();};
+        chips.appendChild(b);
+      });
+    } else if(s.type==='multi'){
+      input.style.display='none';send.style.display='none';
+      s.options.forEach(o=>{
+        const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=o;
+        b.setAttribute('aria-pressed','false');
+        b.onclick=()=>{const i=multiSel.indexOf(o);
+          if(i>-1){multiSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}
+          else{multiSel.push(o);b.classList.add('on');b.setAttribute('aria-pressed','true');}};
+        chips.appendChild(b);
+      });
+      const done=document.createElement('button');done.className='chip-done';done.type='button';done.textContent='Done';
+      done.onclick=()=>{
+        if(!multiSel.length){err.textContent="Pick at least one language.";return;}
+        meSay(multiSel.join(', '));data[s.key]=multiSel.slice();step++;next();};
+      chips.appendChild(done);
+    } else {
+      input.style.display='';send.style.display='';input.value='';input.focus();
+    }
+  }
+
+  function submitText(){
+    const s=steps[step];if(!s||s.type!=='text')return;
+    let v=input.value.trim();
+    if(!v && !s.optional){err.textContent="Please type an answer.";return;}
+    if(s.validate){const r=s.validate(v);if(r!==true){err.textContent=r;return;}}
+    if(s.transform)v=s.transform(v);
+    if(v)meSay(v); else meSay("(skipped)");
+    data[s.key]=v;step++;next();
+  }
+  function next(){setBar();setTimeout(ask,260);}
+
+  send.addEventListener('click',submitText);
+  input.addEventListener('input',()=>{err.textContent='';input.style.height='auto';input.style.height=Math.min(input.scrollHeight,140)+'px';});
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submitText();}});
+
+  function finish(){
+    input.style.display='none';send.style.display='none';chips.innerHTML='';hint.textContent='';bar.style.width='100%';
+    botSay("That's everything — thank you! Sending your listing to the directory…");
+    post();
+  }
+
+  function post(){
+    const payload={
+      form:'directory-listing',
+      status:'Pending',
+      submittedAt:new Date().toISOString(),
+      business:data.business||'',owner:data.owner||'',category:data.category||'',
+      city:data.city||'',country:data.country||'',serves:data.serves||'',
+      languages:(data.languages||[]).join(', '),website:data.website||'',
+      referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||''
+    };
+    const finishUI=()=>{
+      const c=document.createElement('div');c.className='done-card';
+      c.innerHTML='<h2>You\u2019re in the queue \u2705</h2><p style="color:var(--muted);font-size:14px;margin:0 0 14px">Kimberly reviews new listings and adds them once approved. You\u2019ll see it live on the directory soon.</p><a class="chip-done" style="display:inline-block;text-decoration:none" href="directory.html">Back to the directory</a>';
+      log.appendChild(c);scroll();
+    };
+    if(!API_URL){ botSay("(Preview mode — no endpoint set yet, so nothing was sent.)"); finishUI(); return; }
+    fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+      .then(()=>finishUI()).catch(()=>finishUI());
+  }
+
+  // start
+  botSay("Hi! I\u2019ll add your business to The Friends Directory. Ready when you are.");
+  setTimeout(ask,500);
+</script>
+</body>
+</html>

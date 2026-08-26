@@ -26,7 +26,9 @@
   .label{font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--muted)}
   h1{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;margin:0;letter-spacing:-.01em}
 
-  header{padding:26px 0 18px;border-bottom:1px solid var(--border)}
+  header{padding:20px 0 18px;border-bottom:1px solid var(--border)}
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.13em;font-size:11px;color:var(--muted);margin-bottom:14px}
+  .backlink:hover{color:var(--teal)}
   .status{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,191,191,.5)}70%{box-shadow:0 0 0 9px rgba(42,191,191,0)}100%{box-shadow:0 0 0 0 rgba(42,191,191,0)}}
@@ -44,14 +46,23 @@
   .chip:hover{border-color:var(--teal)}
   .chip.on{background:var(--teal);color:#04211f;border-color:var(--teal)}
   .chip-done{font-family:'DM Sans';font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:22px;
-             background:var(--gold);color:#3a2708;border:none;cursor:pointer}
+             background:var(--gold);color:#3a2708;border:none;cursor:pointer;margin-top:2px}
+
+  .catlist{display:flex;flex-direction:column;gap:8px;padding:2px 0 6px;width:100%}
+  .catrow{display:block;width:100%;text-align:left;background:var(--card-alt);border:1px solid var(--border-strong);
+          border-radius:12px;padding:11px 14px;cursor:pointer}
+  .catrow:hover{border-color:var(--teal)}
+  .catrow.on{background:var(--teal-dim);border-color:var(--teal)}
+  .catrow .cn{font-family:'DM Sans';font-weight:600;font-size:14px;color:var(--text);display:block}
+  .catrow.on .cn{color:var(--teal)}
+  .catrow .ch{font-size:12px;color:var(--muted);display:block;margin-top:2px;line-height:1.35}
 
   .composer{position:sticky;bottom:0;background:linear-gradient(transparent,var(--page) 22%);
             padding:14px 0 22px;display:flex;flex-direction:column;gap:6px}
   .row{display:flex;gap:10px}
   textarea{flex:1;resize:none;background:var(--card);color:var(--text);border:1px solid var(--border-strong);
            border-radius:12px;padding:13px 14px;font-family:'DM Sans';font-size:15px;min-height:48px;max-height:140px}
-  textarea:focus,.chip:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  textarea:focus,.chip:focus-visible,.catrow:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
   .send{background:var(--teal);color:#04211f;border:none;border-radius:12px;padding:0 20px;
         font-family:'DM Sans';font-weight:600;font-size:15px;cursor:pointer}
   .send:disabled{opacity:.4;cursor:not-allowed}
@@ -68,7 +79,8 @@
 <body>
 <div class="shell">
   <header>
-    <span class="status"><span class="dot" aria-hidden="true"></span><span class="label">Intake · The Friends Directory</span></span>
+    <a class="backlink" href="directory.html">&larr; The Friends Directory</a>
+    <span class="status"><span class="dot" aria-hidden="true"></span><span class="label">Intake · List your business</span></span>
     <h1>Let's get you listed</h1>
     <p class="sub">A few quick questions — answer by tapping or typing. Takes about two minutes.</p>
     <div class="progress" aria-hidden="true"><i id="bar"></i></div>
@@ -89,13 +101,26 @@
 </div>
 
 <script>
-  // ── Paste your Apps Script Web App URL here (the /exec link). ──
+  // ── Apps Script Web App URL (the /exec link). ──
   const API_URL = "https://script.google.com/macros/s/AKfycbxxohDflp4MZ0-3hcNW9o5JPemJaYBVt9jP0CK12j3LIsaPhV0PgUO8kqdR_lA2Bplf/exec";
 
-  const CATEGORIES = [
-    "Home & Trades","Beauty & Wellness","Health & Wellness","Food & Catering",
-    "Professional Services","Tech & Digital","Creative & Media","Retail & E-commerce",
-    "Real Estate & Lodging","Auto & Transport","Education & Coaching"
+  // Categories with example hints, so people know where they fit.
+  const CATS=[
+    {name:"Home & Trades",hint:"plumbing, electrical, handyman, cleaning, landscaping"},
+    {name:"Construction",hint:"contractors, builders, remodeling, roofing"},
+    {name:"Beauty & Wellness",hint:"hair, nails, skincare, spa, barber"},
+    {name:"Health & Wellness",hint:"fitness, personal training, nutrition, massage, therapy"},
+    {name:"Food & Catering",hint:"catering, baking, personal chef, food trucks"},
+    {name:"Event Planning",hint:"events, weddings, travel planning, party rentals"},
+    {name:"Professional Services",hint:"accounting, financial advising, grant writing, legal / paralegal, consulting"},
+    {name:"Tech & Digital",hint:"web design, IT, automation, apps, AI services"},
+    {name:"Creative & Media",hint:"photography, video, graphic design, advertising"},
+    {name:"Retail & E-commerce",hint:"online shops, crafts, boutiques, handmade goods"},
+    {name:"Real Estate & Lodging",hint:"home rentals, short-term stays, realtors, property"},
+    {name:"Auto & Transport",hint:"auto repair, detailing, rideshare, moving, delivery"},
+    {name:"Education & Coaching",hint:"tutoring, coaching, lessons, mentoring"},
+    {name:"Training",hint:"workshops & courses — AI literacy, grant writing, language, business dev"},
+    {name:"Other",hint:"don't see your fit? pick this and tell us"}
   ];
 
   const log=document.getElementById('log'), chips=document.getElementById('chips'),
@@ -105,13 +130,13 @@
   const data={};
   let step=0;
 
-  // Each step: prompt, key, type, options, validate, optional
-  const steps=[
+  let steps=[
     {key:'business',type:'text',prompt:"First up — what's your business called?",
      validate:v=>v.length>=2||"Please enter your business name."},
     {key:'owner',type:'text',prompt:"And who runs it — your name or the contact person?",
      validate:v=>v.length>=2||"Please enter a name."},
-    {key:'category',type:'single',prompt:"Which category fits best?",options:CATEGORIES},
+    {key:'categories',type:'category',prompt:"Which category fits? Tap all that apply.",
+     hint:"Pick one or more, then tap Done."},
     {key:'city',type:'text',prompt:"What city are you in?",validate:v=>v.length>=2||"Please enter a city."},
     {key:'country',type:'text',prompt:"And which country?",validate:v=>v.length>=2||"Please enter a country."},
     {key:'serves',type:'single',prompt:"Who do you serve?",options:["Local","Online","Both"],
@@ -120,19 +145,23 @@
      options:["English","Spanish","ASL","Other"],hint:"Tap all that apply, then tap Done. ASL is welcome here."},
     {key:'website',type:'text',prompt:"Do you have a website? Paste the link — or type \u201cnone\u201d if not yet.",
      transform:v=>/^none$/i.test(v.trim())?"":v.trim()},
-    {key:'referredBy',type:'text',prompt:"Last community question: which friend referred you in?",
-     validate:v=>v.length>=2||"A referral keeps this directory just for the friends.",
-     hint:"Their name helps us keep it by the friends, for the friends."},
-    {key:'description',type:'text',prompt:"Finally — describe your business in a sentence or two.",
+    {key:'referredBy',type:'text',prompt:"Which friend referred you in?",
+     validate:v=>v.length>=2||"A referral keeps this directory by the friends, for the friends.",
+     hint:"This keeps listings within the community."},
+    {key:'referredByContact',type:'text',prompt:"How can we reach them? A name & contact, or which congregation / area — whatever you're comfortable sharing.",
+     validate:v=>v.length>=2||"A way to reach them, or a congregation / area, helps us confirm."},
+    {key:'description',type:'text',prompt:"Describe your business in a sentence or two.",
      validate:v=>v.length>=10||"A little more detail helps guests understand what you offer.",
      hint:"This shows on your listing card."},
     {key:'contact',type:'text',prompt:"How should guests reach you? (email, WhatsApp, or \u201cvia my site\u201d)",
-     optional:true}
+     optional:true},
+    {key:'consent',type:'single',prompt:"Last thing — may we email you now and then with grant deadlines, workshops, and growth tips?",
+     options:["Yes","No"],hint:"You'll be listed either way — this is just for occasional updates."}
   ];
 
-  function botSay(t){const d=document.createElement('div');d.className='msg bot';d.textContent=t;log.appendChild(d);scroll();}
-  function meSay(t){const d=document.createElement('div');d.className='msg me';d.textContent=t;log.appendChild(d);scroll();}
-  function scroll(){requestAnimationFrame(()=>log.lastChild&&log.lastChild.scrollIntoView({behavior:'smooth',block:'end'}));}
+  function botSay(t){const d=document.createElement('div');d.className='msg bot';d.textContent=t;log.appendChild(d);scrollDown();}
+  function meSay(t){const d=document.createElement('div');d.className='msg me';d.textContent=t;log.appendChild(d);scrollDown();}
+  function scrollDown(){requestAnimationFrame(()=>log.lastChild&&log.lastChild.scrollIntoView({behavior:'smooth',block:'end'}));}
   function setBar(){bar.style.width=Math.round((step/steps.length)*100)+'%';}
 
   let multiSel=[];
@@ -163,8 +192,36 @@
       });
       const done=document.createElement('button');done.className='chip-done';done.type='button';done.textContent='Done';
       done.onclick=()=>{
-        if(!multiSel.length){err.textContent="Pick at least one language.";return;}
+        if(!multiSel.length){err.textContent="Pick at least one.";return;}
         meSay(multiSel.join(', '));data[s.key]=multiSel.slice();step++;next();};
+      chips.appendChild(done);
+    } else if(s.type==='category'){
+      input.style.display='none';send.style.display='none';
+      const list=document.createElement('div');list.className='catlist';
+      CATS.forEach(c=>{
+        const b=document.createElement('button');b.className='catrow';b.type='button';b.setAttribute('aria-pressed','false');
+        b.innerHTML='<span class="cn"></span><span class="ch"></span>';
+        b.querySelector('.cn').textContent=c.name;
+        b.querySelector('.ch').textContent=c.hint;
+        b.onclick=()=>{const i=multiSel.indexOf(c.name);
+          if(i>-1){multiSel.splice(i,1);b.classList.remove('on');b.setAttribute('aria-pressed','false');}
+          else{multiSel.push(c.name);b.classList.add('on');b.setAttribute('aria-pressed','true');}};
+        list.appendChild(b);
+      });
+      chips.appendChild(list);
+      const done=document.createElement('button');done.className='chip-done';done.type='button';done.textContent='Done';
+      done.onclick=()=>{
+        if(!multiSel.length){err.textContent="Pick at least one category.";return;}
+        data.categories=multiSel.slice();
+        meSay(multiSel.join(', '));
+        const ins=[];
+        if(multiSel.indexOf('Training')>-1) ins.push({key:'trainingType',type:'text',
+          prompt:"You picked Training — what kind? (e.g. AI literacy, grant writing, language, business development)",optional:true});
+        if(multiSel.indexOf('Other')>-1) ins.push({key:'otherType',type:'text',
+          prompt:"You picked Other — what type of business is it?",validate:v=>v.length>=2||"Tell us your business type."});
+        if(ins.length) steps.splice(step+1,0,...ins);
+        step++;next();
+      };
       chips.appendChild(done);
     } else {
       input.style.display='';send.style.display='';input.value='';input.focus();
@@ -193,26 +250,31 @@
   }
 
   function post(){
+    const cats=(data.categories||[]).map(function(c){
+      if(c==='Training' && data.trainingType) return 'Training ('+data.trainingType+')';
+      if(c==='Other' && data.otherType) return 'Other: '+data.otherType;
+      return c;
+    });
     const payload={
       form:'directory-listing',
       status:'Pending',
       submittedAt:new Date().toISOString(),
-      business:data.business||'',owner:data.owner||'',category:data.category||'',
+      business:data.business||'',owner:data.owner||'',category:cats.join(', '),
       city:data.city||'',country:data.country||'',serves:data.serves||'',
       languages:(data.languages||[]).join(', '),website:data.website||'',
-      referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||''
+      referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||'',
+      referredByContact:data.referredByContact||'',consent:data.consent||''
     };
     const finishUI=()=>{
       const c=document.createElement('div');c.className='done-card';
       c.innerHTML='<h2>You\u2019re in the queue \u2705</h2><p style="color:var(--muted);font-size:14px;margin:0 0 14px">Kimberly reviews new listings and adds them once approved. You\u2019ll see it live on the directory soon.</p><a class="chip-done" style="display:inline-block;text-decoration:none" href="directory.html">Back to the directory</a>';
-      log.appendChild(c);scroll();
+      log.appendChild(c);scrollDown();
     };
     if(!API_URL){ botSay("(Preview mode — no endpoint set yet, so nothing was sent.)"); finishUI(); return; }
     fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
       .then(()=>finishUI()).catch(()=>finishUI());
   }
 
-  // start
   botSay("Hi! I\u2019ll add your business to The Friends Directory. Ready when you are.");
   setTimeout(ask,500);
 </script>

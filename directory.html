@@ -228,13 +228,24 @@
 
   function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
+  // Normalize a website value into a safe absolute URL, whatever the friend typed.
+  function fixUrl(raw){
+    let u = String(raw||'').trim();
+    if(!u) return '';
+    if(/^https?:\/\//i.test(u)) return u;          // already has http(s)
+    u = u.replace(/^\/+/,'');                        // strip stray leading slashes
+    if(/^(mailto:|tel:)/i.test(u)) return u;         // leave mail/phone links
+    return 'https://' + u;                           // add https:// to bare domains
+  }
+
   function card(b){
     const langs = (b.languages||[]).map(l=>{
       const cls = l==='ASL' ? 'pill asl' : 'pill lang';
       return `<span class="${cls}">${esc(l)}</span>`;
     }).join('');
-    const site = b.website
-      ? `<a class="visit" href="${esc(b.website)}" target="_blank" rel="noopener">Visit site <span class="arrow" aria-hidden="true">→</span></a>`
+    const url = fixUrl(b.website);
+    const site = url
+      ? `<a class="visit" href="${esc(url)}" target="_blank" rel="noopener">Visit site <span class="arrow" aria-hidden="true">→</span></a>`
       : `<span class="nosite">Website coming soon — <a href="https://needgreatersuccess.com/discovery">get one built</a></span>`;
     const feat = b.featured ? `<span class="flag-feat">★ Featured</span>` : '';
     return `<article class="card${b.featured?' featured':''}">

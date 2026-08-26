@@ -158,6 +158,7 @@
     </div>
     <span class="count" id="count" aria-live="polite"></span>
   </div>
+  <div class="wrap"><p id="catHint" aria-live="polite" style="margin:10px 0 0;font-size:12.5px;color:var(--muted)"></p></div>
 </nav>
 
 <main class="wrap">
@@ -177,11 +178,25 @@
   // ── Paste your Apps Script Web App URL here (the /exec link). Leave blank to preview with sample data. ──
   const API_URL = "https://script.google.com/macros/s/AKfycbxxohDflp4MZ0-3hcNW9o5JPemJaYBVt9jP0CK12j3LIsaPhV0PgUO8kqdR_lA2Bplf/exec";
 
-  const CATEGORIES = [
-    "Home & Trades","Beauty & Wellness","Health & Wellness","Food & Catering",
-    "Professional Services","Tech & Digital","Creative & Media","Retail & E-commerce",
-    "Real Estate & Lodging","Auto & Transport","Education & Coaching"
+  const CATS = [
+    {name:"Home & Trades",hint:"plumbing, electrical, handyman, cleaning, landscaping"},
+    {name:"Construction",hint:"contractors, builders, remodeling, roofing"},
+    {name:"Beauty & Wellness",hint:"hair, nails, skincare, spa, barber"},
+    {name:"Health & Wellness",hint:"fitness, personal training, nutrition, massage, therapy"},
+    {name:"Food & Catering",hint:"catering, baking, personal chef, food trucks"},
+    {name:"Event Planning",hint:"events, weddings, travel planning, party rentals"},
+    {name:"Professional Services",hint:"accounting, financial advising, grant writing, legal / paralegal, consulting"},
+    {name:"Tech & Digital",hint:"web design, IT, automation, apps, AI services"},
+    {name:"Creative & Media",hint:"photography, video, graphic design, advertising"},
+    {name:"Retail & E-commerce",hint:"online shops, crafts, boutiques, handmade goods"},
+    {name:"Real Estate & Lodging",hint:"home rentals, short-term stays, realtors, property"},
+    {name:"Auto & Transport",hint:"auto repair, detailing, rideshare, moving, delivery"},
+    {name:"Education & Coaching",hint:"tutoring, coaching, lessons, mentoring"},
+    {name:"Training",hint:"workshops & courses — AI literacy, grant writing, language, business dev"},
+    {name:"Other",hint:"a business type not listed above"}
   ];
+  const CATEGORIES = CATS.map(c=>c.name);
+  const CATHINTS = {}; CATS.forEach(c=>{ CATHINTS[c.name]=c.hint; });
 
   // Sample data so the page previews before the backend is wired up.
   const SAMPLE = [
@@ -206,6 +221,7 @@
   const listings = document.getElementById('listings');
   const catSel = document.getElementById('cat');
   const countEl = document.getElementById('count');
+  const catHintEl = document.getElementById('catHint');
   CATEGORIES.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;catSel.appendChild(o);});
 
   let DATA = [];
@@ -236,10 +252,11 @@
   function render(){
     const q=document.getElementById('q').value.trim().toLowerCase();
     const cat=catSel.value, serves=document.getElementById('serves').value, lang=document.getElementById('lang').value;
+    catHintEl.textContent = cat ? (CATHINTS[cat]||'') : '';
     const rows = DATA.filter(b=>{
       const hay=`${b.business} ${b.owner} ${b.category} ${b.city} ${b.country} ${b.description}`.toLowerCase();
       if(q && !hay.includes(q)) return false;
-      if(cat && b.category!==cat) return false;
+      if(cat && !String(b.category||'').includes(cat)) return false;
       if(serves && b.serves!==serves) return false;
       if(lang && !(b.languages||[]).includes(lang)) return false;
       return true;

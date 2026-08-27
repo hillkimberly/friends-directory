@@ -192,6 +192,26 @@
     return 'https://' + u.replace(/^\/+/,'');
   }
 
+  // Sheets may store "$10,000" as the number 10000. Re-add $ + commas for bare numbers;
+  // leave anything with text ("Up to $100,000", "Varies") exactly as-is.
+  function money(v){
+    const s = String(v==null?'':v).trim();
+    if(!s) return '—';
+    return /^\d+(\.\d+)?$/.test(s) ? '$' + Number(s).toLocaleString('en-US') : s;
+  }
+
+  // Sheets may store a reopen label like "Jan 2027" as an ISO date. Show a clean
+  // "Reopens Mon YYYY" for those; leave text labels ("Check current cycle") as-is.
+  function fmtReopen(v){
+    const s = String(v==null?'':v).trim();
+    if(!s) return '';
+    const d = new Date(s);
+    if(!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}/.test(s)){
+      return 'Reopens ' + d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+    }
+    return s;
+  }
+
   // If a deadline parses as a real date within 14 days, flag it "Closing soon".
   function daysUntil(deadline){
     const d = new Date(deadline);
@@ -210,7 +230,7 @@
       ? `<a class="gapply" href="${esc(url)}" target="_blank" rel="noopener">Apply <span class="arrow" aria-hidden="true">→</span></a>`
       : '';
     return `<article class="gcard${soon?' soon':''}">
-      <div class="gamt">${esc(g.amount||'—')}</div>
+      <div class="gamt">${esc(money(g.amount))}</div>
       <h3>${esc(g.title)}</h3>
       <div class="gfunder">${esc(g.funder)}</div>
       <div class="gfor">${esc(g.forWho)}</div>
@@ -221,12 +241,13 @@
 
   function closedCard(g){
     const url = fixUrl(g.link);
-    const reopen = g.reopens ? `<span class="greopen">${esc(g.reopens)}</span>` : '';
+    const rlabel = fmtReopen(g.reopens);
+    const reopen = rlabel ? `<span class="greopen">${esc(rlabel)}</span>` : '';
     const view = url
       ? `<a class="gview" href="${esc(url)}" target="_blank" rel="noopener">View program <span class="arrow" aria-hidden="true">→</span></a>`
       : '';
     return `<article class="gcard">
-      <div class="gamt">${esc(g.amount||'—')}</div>
+      <div class="gamt">${esc(money(g.amount))}</div>
       <h3>${esc(g.title)}</h3>
       <div class="gfunder">${esc(g.funder)}</div>
       <div class="gfor">${esc(g.forWho)}</div>

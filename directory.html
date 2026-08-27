@@ -207,7 +207,7 @@
      website:"https://cozydeserthome.com",featured:true,
      description:"A warm short-term stay in the Arizona desert — book the whole house or by the room."},
     {business:"Need Greater Success",owner:"Kimberly Hill",category:"Tech & Digital",
-     city:"Dallas–Fort Worth",country:"USA",serves:"Both",languages:["English"],
+     city:"Dallas–Fort Worth",country:"USA",serves:"Local + online",languages:["English"],
      website:"https://needgreatersuccess.com",featured:false,
      description:"Microsoft 365 automation, AI workflow design, and web design for small businesses."},
     {business:"Isla Bella Designs",owner:"Cara",category:"Creative & Media",
@@ -296,6 +296,8 @@
       const d=await jsonp(API_URL+'?action=listings');
       DATA = Array.isArray(d) ? d : SAMPLE;   // null = load failed → sample; [] = no listings yet → empty state
     } else { DATA = SAMPLE; }
+    // Legacy "Both" → "Local + online" so older rows still filter and display right.
+    DATA.forEach(b=>{ if(String(b.serves||'').trim().toLowerCase()==='both') b.serves='Local + online'; });
     listings.setAttribute('aria-busy','false');
     render();
   }

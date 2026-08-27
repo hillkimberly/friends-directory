@@ -145,15 +145,6 @@
     <a class="btn" href="https://needgreatersuccess.com/discovery" target="_blank" rel="noopener">Book a working session <span aria-hidden="true">→</span></a>
   </section>
 
-  <section class="sec archive" id="archiveSec" aria-label="Closed grants" style="display:none">
-    <div class="sec-head">
-      <h2>Closed for now</h2>
-      <span class="count" id="closedCount"></span>
-    </div>
-    <p class="sec-note">These aren't accepting applications today, but they come back around. Use the quiet months to get application-ready — then apply the moment they reopen.</p>
-    <div class="grid" id="closedGrants"></div>
-  </section>
-
   <p class="disclaimer">The Friends Directory tracks grants as a free community resource. Amounts, deadlines, and eligibility are set by each funder and can change — always confirm details on the funder's own page before applying. We are not affiliated with any funder listed here.</p>
 </main>
 
@@ -267,11 +258,8 @@
     openCount.textContent = open.length + ' open';
     tracker.textContent = 'Tracking ' + open.length + ' open grant' + (open.length===1?'':'s');
 
-    if(closed.length){
-      archiveSec.style.display = '';
-      closedWrap.innerHTML = closed.map(closedCard).join('');
-      closedCount.textContent = closed.length + ' reopening';
-    }
+    // Closed grants are intentionally NOT shown on the free page — the "grant
+    // calendar" (what's reopening and when) is part of the paid match report.
   }
 
   function jsonp(url){return new Promise(function(resolve){

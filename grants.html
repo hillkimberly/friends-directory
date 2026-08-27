@@ -4,241 +4,257 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find grants — The Friends Directory</title>
-<meta name="description" content="Match your small business to the right grant sources — federal, state, and private — with links to always-current programs.">
+<meta name="description" content="Real funding for the friends — vetted, current, and free to browse. We track what's open so you don't have to. Apply directly to the funder.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --page:#080b0f;--raised:#0d1117;--card:#111820;--card-alt:#141d28;--border:#1a2535;--border-strong:#243040;
-    --teal:#2abfbf;--teal-alt:#1a9fcc;--teal-dim:rgba(42,191,191,.12);
-    --gold:#f0a94a;--coral:#e85d5d;--text:#f0f6ff;--muted:#8794aa;--grid:rgba(42,191,191,.03);
+    --page:#080b0f; --raised:#0d1117; --card:#111820; --card-alt:#141d28;
+    --border:#1a2535; --border-strong:#243040;
+    --teal:#2abfbf; --teal-alt:#1a9fcc; --teal-dim:rgba(42,191,191,.12);
+    --gold:#f0a94a; --gold-dim:rgba(240,169,74,.12); --coral:#e85d5d; --coral-dim:rgba(232,93,93,.12);
+    --text:#f0f6ff; --muted:#8794aa;
+    --grid:rgba(42,191,191,.03);
   }
   *{box-sizing:border-box}
   html{background:var(--page)!important;color-scheme:dark}
-  body{margin:0;background:var(--page)!important;color:var(--text)!important;
-       font-family:'DM Sans',system-ui,sans-serif;font-weight:400;line-height:1.6;min-height:100vh}
-  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-    background-size:48px 48px}
-  .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 20px}
+  body{
+    margin:0;background:var(--page)!important;color:var(--text)!important;
+    font-family:'DM Sans',system-ui,sans-serif;font-weight:400;
+    line-height:1.6;min-height:100vh;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:48px 48px;
+  }
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 20px}
   a{color:var(--teal);text-decoration:none}
   .label{font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.16em;font-size:12px;color:var(--muted)}
-  h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800;line-height:1.06;letter-spacing:-.01em;margin:0}
+  h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800;line-height:1.05;letter-spacing:-.01em;margin:0}
 
-  header{padding:30px 0 20px;border-bottom:1px solid var(--border)}
-  .nav{display:flex;gap:22px;margin-bottom:20px;flex-wrap:wrap}
-  .nav a{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.13em;font-size:12px;color:var(--muted)}
-  .nav a.active{color:var(--teal)}
-  .nav a:hover{color:var(--text)}
-  .status{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+  header{padding:30px 0 26px;border-bottom:1px solid var(--border)}
+  .topnav{display:flex;gap:22px;margin-bottom:20px;flex-wrap:wrap}
+  .topnav a{font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.13em;font-size:12px;color:var(--muted)}
+  .topnav a.active{color:var(--teal)}
+  .topnav a:hover{color:var(--text)}
+  .status{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);
+       box-shadow:0 0 0 0 rgba(42,191,191,.6);animation:pulse 2s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,191,191,.5)}70%{box-shadow:0 0 0 9px rgba(42,191,191,0)}100%{box-shadow:0 0 0 0 rgba(42,191,191,0)}}
-  h1{font-size:clamp(28px,4.6vw,42px)}
+  h1{font-size:clamp(30px,5vw,46px)}
   .tag{color:var(--muted);margin-top:10px;max-width:60ch;font-size:15px}
 
-  .note{margin:24px 0;padding:16px 18px;border:1px solid var(--border-strong);border-left:3px solid var(--gold);
-        border-radius:0 10px 10px 0;background:var(--card);font-size:14px;color:#c4cfe0}
-  .note strong{color:var(--gold);font-weight:600}
+  /* Section headers */
+  .sec{padding:34px 0 8px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .sec-head h2{font-size:clamp(22px,3.4vw,30px)}
+  .sec-head .count{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--muted)}
+  .sec-note{color:var(--muted);font-size:14px;margin:0 0 18px;max-width:64ch}
 
-  section{padding:30px 0}
-  .eyebrow{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.16em;font-size:12px;color:var(--teal);margin-bottom:8px}
-  h2{font-size:24px;margin-bottom:6px}
-  .lead{color:var(--muted);font-size:15px;margin-bottom:20px;max-width:60ch}
+  /* Grant grid + cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding-bottom:8px}
+  .gcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;
+         display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s}
+  .gcard:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+  .gcard.soon{border-color:rgba(240,169,74,.4);box-shadow:0 0 0 1px rgba(240,169,74,.18)}
+  .gamt{font-family:'Syne';font-weight:800;font-size:30px;line-height:1;color:var(--gold)}
+  .gcard h3{font-size:19px;margin-top:2px}
+  .gfunder{font-size:13px;color:var(--muted)}
+  .gfor{font-size:14px;color:#c4cfe0;flex:1}
+  .gmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
+  .gpill{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;
+         padding:4px 10px;border-radius:20px;border:1px solid var(--border-strong);color:var(--muted)}
+  .gpill.deadline{color:var(--teal);border-color:rgba(42,191,191,.4);background:var(--teal-dim)}
+  .gpill.soon{color:var(--gold);border-color:rgba(240,169,74,.45);background:var(--gold-dim)}
+  .gapply{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;margin-top:6px;
+          background:var(--teal);color:#04211f;font-family:'DM Sans';font-weight:600;font-size:14px;
+          padding:10px 18px;border-radius:10px}
+  .gapply:hover{background:#3ad2d2}
+  .gapply .arrow{transition:transform .2s;display:inline-block}
+  .gapply:hover .arrow{transform:translateX(3px)}
 
-  .group{margin-bottom:18px}
-  .group .label{margin-bottom:9px;display:block}
-  .chips{display:flex;flex-wrap:wrap;gap:9px}
-  .chip{font-family:'DM Sans';font-weight:500;font-size:13.5px;padding:9px 15px;border-radius:22px;
-        background:var(--card-alt);color:var(--text);border:1px solid var(--border-strong);cursor:pointer}
-  .chip:hover{border-color:var(--teal)}
-  .chip.on{background:var(--teal);color:#04211f;border-color:var(--teal)}
-  .chip:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  /* Archive (closed) — visible but muted */
+  .archive .gcard{background:var(--raised);border-style:dashed;border-color:var(--border);opacity:.82}
+  .archive .gcard:hover{opacity:1;transform:none;border-color:var(--border-strong)}
+  .archive .gamt{color:var(--muted)}
+  .gpill.closed{color:var(--coral);border-color:rgba(232,93,93,.4);background:var(--coral-dim)}
+  .greopen{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;color:var(--gold)}
+  .gview{align-self:flex-start;margin-top:6px;font-family:'DM Sans';font-weight:600;font-size:14px;color:var(--muted)}
+  .gview:hover{color:var(--teal)}
+  .gview .arrow{transition:transform .2s;display:inline-block}
+  .gview:hover .arrow{transform:translateX(3px)}
 
-  .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:26px}
-  .src{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:9px}
-  .src:hover{border-color:var(--border-strong)}
-  .src .kind{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;color:var(--teal)}
-  .src h3{font-size:18px}
-  .src p{font-size:14px;color:#c4cfe0;margin:0;flex:1}
-  .src .elig{font-size:12.5px;color:var(--muted)}
-  .src .go{font-family:'DM Sans';font-weight:600;font-size:14px;color:var(--teal);margin-top:2px}
-  .src .go .arrow{display:inline-block;transition:transform .2s}
-  .src .go:hover .arrow{transform:translateX(3px)}
+  /* Paid-help band */
+  .help{margin:36px 0 8px;background:linear-gradient(180deg,var(--card-alt),var(--card));
+        border:1px solid var(--border-strong);border-radius:16px;padding:26px 24px}
+  .help .label{color:var(--teal);margin-bottom:10px;display:block}
+  .help h2{font-size:clamp(20px,3vw,26px);margin-bottom:10px}
+  .help p{color:#c4cfe0;font-size:14.5px;max-width:70ch;margin:0 0 8px}
+  .help .fine{color:var(--muted);font-size:13px;margin-top:10px}
+  .help .btn{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--teal);color:#04211f;
+             font-family:'DM Sans';font-weight:600;font-size:14px;padding:12px 20px;border-radius:10px}
+  .help .btn:hover{background:#3ad2d2}
 
-  /* Curated feed */
-  .feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .grant{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px}
-  .grant .amt{font-family:'Syne';font-weight:800;font-size:22px;color:var(--gold)}
-  .grant h3{font-size:17px}
-  .grant .who{font-size:13px;color:var(--muted)}
-  .grant .deadline{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:#c4cfe0}
-  .grant .deadline.soon{color:var(--coral)}
-  .grant .go{font-family:'DM Sans';font-weight:600;font-size:14px;color:var(--teal);margin-top:auto}
-  .empty{grid-column:1/-1;color:var(--muted);padding:20px 0}
-
-  footer{border-top:1px solid var(--border);padding:26px 0 46px;color:var(--muted);font-size:13px}
+  .empty{grid-column:1/-1;text-align:center;padding:44px 20px;color:var(--muted);
+         border:1px dashed var(--border);border-radius:14px}
+  footer{border-top:1px solid var(--border);padding:28px 0 48px;margin-top:34px;color:var(--muted);font-size:13px}
+  footer .a11y{margin-top:8px;max-width:60ch}
   .brandline{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--muted)}
-  .disclaimer{margin-top:8px;max-width:64ch}
-  @media (max-width:560px){.results,.feed{grid-template-columns:1fr}}
-  @media (prefers-reduced-motion:reduce){.dot{animation:none}.src .go .arrow{transition:none}}
+  .disclaimer{color:var(--muted);font-size:12.5px;margin-top:14px;max-width:72ch}
+
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){
+    .dot{animation:none}.gcard{transition:none}.gapply .arrow,.gview .arrow{transition:none}
+  }
 </style>
 </head>
 <body>
+<a href="#watching" style="position:absolute;left:-9999px">Skip to grants</a>
+
 <header>
   <div class="wrap">
-    <nav class="nav" aria-label="Directory sections">
+    <nav class="topnav" aria-label="Directory sections">
       <a href="directory.html">Directory</a>
       <a href="grants.html" class="active" aria-current="page">Find grants</a>
       <a href="directory-intake.html">List your business</a>
     </nav>
-    <span class="status"><span class="dot" aria-hidden="true"></span><span class="label">Funding for the friends</span></span>
-    <h1>Find grants for your business</h1>
-    <p class="tag">Tell us a little about your business and we'll point you to the grant sources worth your time — with links straight to the programs, always current.</p>
+    <span class="status"><span class="dot" aria-hidden="true"></span><span class="label" id="tracker">Live grant tracker</span></span>
+    <h1>Grants for the friends</h1>
+    <p class="tag">Real funding, vetted and current. Browse what's open, apply directly to the funder — we take nothing and charge nothing to look. We update this as windows open and close.</p>
   </div>
 </header>
 
-<div class="wrap">
-  <div class="note">
-    <strong>Before you start:</strong> grants are non-repayable, but they're competitive and usually count as taxable income. The biggest barrier isn't qualifying — it's never applying, so pick one and start. And stay safe: no legitimate program guarantees you a grant or asks you to pay a fee to "release" funds.
-  </div>
-</div>
-
-<main>
-  <section aria-labelledby="match-h">
-    <div class="wrap">
-      <div class="eyebrow">Grant matcher</div>
-      <h2 id="match-h">What describes your business?</h2>
-      <p class="lead">Pick what applies. We'll surface the sources you're most likely to qualify for.</p>
-
-      <div class="group">
-        <span class="label">Where's your business based?</span>
-        <div class="chips" id="g-loc" role="group" aria-label="Location"></div>
-      </div>
-      <div class="group">
-        <span class="label">What fits you? (optional, pick any)</span>
-        <div class="chips" id="g-id" role="group" aria-label="Business profile"></div>
-      </div>
-
-      <div class="results" id="results" aria-live="polite"></div>
+<main class="wrap">
+  <section class="sec" id="watching" aria-label="Open grants">
+    <div class="sec-head">
+      <h2>Grants we're watching</h2>
+      <span class="count" id="openCount" aria-live="polite"></span>
     </div>
+    <p class="sec-note">Open right now. The monthly ones can be applied to again and again — treat them like a habit.</p>
+    <div class="grid" id="openGrants" aria-busy="true"><div class="empty">Loading grants…</div></div>
   </section>
 
-  <section aria-labelledby="feed-h" style="border-top:1px solid var(--border)">
-    <div class="wrap">
-      <div class="eyebrow">Curated opportunities</div>
-      <h2 id="feed-h">Grants we're watching</h2>
-      <p class="lead">Specific programs vetted for the friends. Check each one for the current round before applying.</p>
-      <div class="feed" id="feed" aria-busy="true"><div class="empty">Loading…</div></div>
-    </div>
+  <section class="help" aria-label="Help applying">
+    <span class="label">Need help applying?</span>
+    <h2>The listings are free. The help is optional.</h2>
+    <p>Everything above is free to browse and always will be. If you want hands-on support — a narrative review, a personalized match report, or a working session to get an application over the line — Need Greater Success offers that as a paid service.</p>
+    <p class="fine">You're paying for consulting time, not for access to grants. No fee is ever tied to whether you win.</p>
+    <a class="btn" href="https://needgreatersuccess.com/discovery" target="_blank" rel="noopener">Book a working session <span aria-hidden="true">→</span></a>
   </section>
+
+  <section class="sec archive" id="archiveSec" aria-label="Closed grants" style="display:none">
+    <div class="sec-head">
+      <h2>Closed for now</h2>
+      <span class="count" id="closedCount"></span>
+    </div>
+    <p class="sec-note">These aren't accepting applications today, but they come back around. Use the quiet months to get application-ready — then apply the moment they reopen.</p>
+    <div class="grid" id="closedGrants"></div>
+  </section>
+
+  <p class="disclaimer">The Friends Directory tracks grants as a free community resource. Amounts, deadlines, and eligibility are set by each funder and can change — always confirm details on the funder's own page before applying. We are not affiliated with any funder listed here.</p>
 </main>
 
 <footer>
   <div class="wrap">
     <div class="brandline">Smarter Systems, Greater Success · built by NGS</div>
-    <p class="disclaimer">This is a starting point, not financial or legal advice — confirm eligibility, deadlines, and tax treatment with each program and a professional. Curated programs are examples to verify, not guarantees of funding.</p>
+    <p class="a11y">Built accessible: full keyboard navigation, screen-reader labels, and reduced-motion support.</p>
   </div>
 </footer>
 
 <script>
-  // ── Paste your Apps Script Web App URL here (the /exec link). ──
+  // ── Apps Script Web App URL (the /exec link). Leave blank to preview with sample data. ──
   const API_URL = "https://script.google.com/macros/s/AKfycbxxohDflp4MZ0-3hcNW9o5JPemJaYBVt9jP0CK12j3LIsaPhV0PgUO8kqdR_lA2Bplf/exec";
 
-  // Grant SOURCES — authoritative, always-current programs. We link out; we never
-  // claim a specific grant is "open now" here. Tags drive the matcher.
-  const SOURCES = [
-    {name:"Grants.gov",kind:"Federal · all",tags:["all"],us:true,
-     blurb:"The central hub for every federally funded grant. Create a free account and set keyword alerts.",
-     elig:"All U.S. businesses · free",url:"https://www.grants.gov"},
-    {name:"SBA local assistance",kind:"Free help",tags:["all"],us:true,
-     blurb:"Your nearest SBDC, SCORE, and Women's Business Center give free counseling and will review your application.",
-     elig:"All U.S. businesses · free advising",url:"https://www.sba.gov/local-assistance"},
-    {name:"Hello Alice",kind:"Private platform",tags:["all","women","minority","veteran"],us:true,
-     blurb:"Free platform running rolling corporate-backed grants year-round. Build one profile, get matched to many.",
-     elig:"U.S. businesses · underrepresented focus, open to all",url:"https://www.helloalice.com/opportunities"},
-    {name:"GrantWatch",kind:"Search tool",tags:["all"],us:true,
-     blurb:"Searchable listings of open grant cycles by region, industry, and founder demographic.",
-     elig:"All businesses · browse free",url:"https://www.grantwatch.com"},
-    {name:"IFundWomen",kind:"Women-owned",tags:["women"],us:true,
-     blurb:"Apply once and get matched to multiple grants aimed at women founders, plus coaching resources.",
-     elig:"Women-owned businesses",url:"https://ifundwomen.com"},
-    {name:"Amber Grant (WomensNet)",kind:"Women-owned",tags:["women"],us:true,
-     blurb:"The most accessible recurring program for women — a grant awarded every month, with year-end awards on top.",
-     elig:"Women 18+ owning ≥50% of a U.S./Canada business · small application fee",url:"https://ambergrantsforwomen.com"},
-    {name:"MBDA business centers",kind:"Minority-owned",tags:["minority"],us:true,
-     blurb:"The federal Minority Business Development Agency funds centers that help minority-owned firms access capital and contracts.",
-     elig:"Minority-owned businesses",url:"https://www.mbda.gov"},
-    {name:"SBA certifications",kind:"Gov contracting",tags:["women","minority","veteran"],us:true,
-     blurb:"WOSB, 8(a), SDVOSB, and HUBZone certifications unlock set-aside government contracts — often bigger than grants.",
-     elig:"Women / minority / veteran / underserved-area owners",url:"https://www.sba.gov/federal-contracting/contracting-assistance-programs"},
-    {name:"SBIR / STTR",kind:"R&D · tech",tags:["tech"],us:true,
-     blurb:"The largest federal funding for research-driven companies. (Reauthorization was pending in early 2026 — check current status.)",
-     elig:"For-profit U.S. R&D firms under 500 employees",url:"https://www.sbir.gov"},
-    {name:"USDA Rural Development",kind:"Rural business",tags:["rural"],us:true,
-     blurb:"Grant and loan programs for businesses in rural areas — from working capital to energy projects.",
-     elig:"Businesses in eligible rural areas",url:"https://www.rd.usda.gov/programs-services"},
-    {name:"State & local programs",kind:"Regional",tags:["all"],us:true,
-     blurb:"Your state economic-development office, county, and chamber of commerce often run grants you won't find nationally.",
-     elig:"Varies by location",url:"https://www.usa.gov/state-governments"}
+  // Preview data (used only if API_URL is blank or the load fails).
+  const SAMPLE = [
+    {status:"Open",amount:"$2,500",title:"Galaxy Grant",funder:"Galaxy of Stars",forWho:"Any small business — general expenses",deadline:"Monthly",link:"https://galaxyofstars.org/galaxy-grants/",reopens:""},
+    {status:"Open",amount:"$1,000",title:"Grow Your Reach Grant",funder:"Grow Your Reach",forWho:"Any small business — marketing",deadline:"Monthly",link:"https://growyourreachgrant.com/",reopens:""},
+    {status:"Closed",amount:"Up to $100,000",title:"Tory Burch Fellows",funder:"Tory Burch Foundation",forWho:"Women founders",deadline:"Annual",link:"https://www.toryburchfoundation.org/fellows/",reopens:"Reopens fall 2026"}
   ];
 
-  const LOCS=[{v:"us",t:"United States"},{v:"outside",t:"Outside the U.S."}];
-  const IDS=[
-    {v:"women",t:"Woman-owned"},{v:"minority",t:"Minority-owned"},{v:"veteran",t:"Veteran-owned"},
-    {v:"rural",t:"Rural area"},{v:"tech",t:"Tech / R&D"}
-  ];
+  const openWrap = document.getElementById('openGrants');
+  const closedWrap = document.getElementById('closedGrants');
+  const archiveSec = document.getElementById('archiveSec');
+  const openCount = document.getElementById('openCount');
+  const closedCount = document.getElementById('closedCount');
+  const tracker = document.getElementById('tracker');
 
-  let loc="us"; const ids=new Set();
-  const elLoc=document.getElementById('g-loc'), elId=document.getElementById('g-id'), out=document.getElementById('results');
-
-  LOCS.forEach(o=>{const b=mkChip(o.t,o.v===loc);b.onclick=()=>{loc=o.v;[...elLoc.children].forEach(c=>c.classList.toggle('on',c.dataset.v===loc));render();};b.dataset.v=o.v;elLoc.appendChild(b);});
-  IDS.forEach(o=>{const b=mkChip(o.t,false);b.setAttribute('aria-pressed','false');b.onclick=()=>{if(ids.has(o.v)){ids.delete(o.v);b.classList.remove('on');b.setAttribute('aria-pressed','false');}else{ids.add(o.v);b.classList.add('on');b.setAttribute('aria-pressed','true');}render();};elId.appendChild(b);});
-
-  function mkChip(text,on){const b=document.createElement('button');b.type='button';b.className='chip'+(on?' on':'');b.textContent=text;return b;}
   function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-  function render(){
-    if(loc==="outside"){
-      out.innerHTML=`<div class="src" style="grid-column:1/-1">
-        <span class="kind">International</span>
-        <h3>Start with your country's programs</h3>
-        <p>Most programs above are U.S.-based (Amber Grant also covers Canada). Outside North America, your national small-business or enterprise-development agency and local chamber are the best first stop, plus any regional development bank programs.</p>
-        <a class="go" href="https://www.grantwatch.com" target="_blank" rel="noopener">Browse GrantWatch <span class="arrow" aria-hidden="true">→</span></a>
-      </div>`;
-      return;
-    }
-    const rows=SOURCES.filter(s=>s.us && (s.tags.includes("all") || [...ids].some(id=>s.tags.includes(id))));
-    out.innerHTML=rows.map(s=>`<article class="src">
-      <span class="kind">${esc(s.kind)}</span>
-      <h3>${esc(s.name)}</h3>
-      <p>${esc(s.blurb)}</p>
-      <div class="elig">${esc(s.elig)}</div>
-      <a class="go" href="${esc(s.url)}" target="_blank" rel="noopener">Open ${esc(s.name)} <span class="arrow" aria-hidden="true">→</span></a>
-    </article>`).join('');
+  function fixUrl(raw){
+    let u = String(raw||'').trim();
+    if(!u) return '';
+    if(/^https?:\/\//i.test(u)) return u;
+    if(/^(mailto:|tel:)/i.test(u)) return u;
+    return 'https://' + u.replace(/^\/+/,'');
   }
-  render();
 
-  // Curated feed (Sheet-backed via ?action=grants, sample fallback)
-  const SAMPLE_GRANTS=[
-    {amount:"$10,000",title:"Amber Grant",funder:"WomensNet",forWho:"Women-owned businesses",
-     deadline:"Recurring · monthly",link:"https://ambergrantsforwomen.com",status:"Active"},
-    {amount:"$5K–$25K",title:"Growth & partner funds",funder:"Hello Alice",forWho:"Underrepresented & all U.S. owners",
-     deadline:"Rolling · check current round",link:"https://www.helloalice.com/opportunities",status:"Active"}
-  ];
-  const feed=document.getElementById('feed');
-  function soon(d){return /day|days|closing/i.test(d);}
-  function grantCard(g){
-    return `<article class="grant">
-      <div class="amt">${esc(g.amount||'')}</div>
+  // If a deadline parses as a real date within 14 days, flag it "Closing soon".
+  function daysUntil(deadline){
+    const d = new Date(deadline);
+    if(isNaN(d.getTime())) return null;
+    return Math.ceil((d - new Date())/86400000);
+  }
+
+  function openCard(g){
+    const days = daysUntil(g.deadline);
+    const soon = days !== null && days >= 0 && days <= 14;
+    const url = fixUrl(g.link);
+    const pill = soon
+      ? `<span class="gpill soon">Closing soon${days===0?' · today':' · '+days+'d'}</span>`
+      : `<span class="gpill deadline">${esc(g.deadline||'Open')}</span>`;
+    const apply = url
+      ? `<a class="gapply" href="${esc(url)}" target="_blank" rel="noopener">Apply <span class="arrow" aria-hidden="true">→</span></a>`
+      : '';
+    return `<article class="gcard${soon?' soon':''}">
+      <div class="gamt">${esc(g.amount||'—')}</div>
       <h3>${esc(g.title)}</h3>
-      <div class="who">${esc(g.funder)} · ${esc(g.forWho)}</div>
-      <div class="deadline${soon(g.deadline||'')?' soon':''}">${esc(g.deadline||'See program')}</div>
-      <a class="go" href="${esc(g.link)}" target="_blank" rel="noopener">Learn more →</a>
+      <div class="gfunder">${esc(g.funder)}</div>
+      <div class="gfor">${esc(g.forWho)}</div>
+      <div class="gmeta">${pill}</div>
+      ${apply}
     </article>`;
   }
+
+  function closedCard(g){
+    const url = fixUrl(g.link);
+    const reopen = g.reopens ? `<span class="greopen">${esc(g.reopens)}</span>` : '';
+    const view = url
+      ? `<a class="gview" href="${esc(url)}" target="_blank" rel="noopener">View program <span class="arrow" aria-hidden="true">→</span></a>`
+      : '';
+    return `<article class="gcard">
+      <div class="gamt">${esc(g.amount||'—')}</div>
+      <h3>${esc(g.title)}</h3>
+      <div class="gfunder">${esc(g.funder)}</div>
+      <div class="gfor">${esc(g.forWho)}</div>
+      <div class="gmeta"><span class="gpill closed">Closed</span>${reopen}</div>
+      ${view}
+    </article>`;
+  }
+
+  function render(rows){
+    const open = rows.filter(g => String(g.status||'').toLowerCase() === 'open');
+    const closed = rows.filter(g => String(g.status||'').toLowerCase() === 'closed');
+
+    openWrap.setAttribute('aria-busy','false');
+    openWrap.innerHTML = open.length
+      ? open.map(openCard).join('')
+      : `<div class="empty">No open grants listed right now — check back soon.</div>`;
+    openCount.textContent = open.length + ' open';
+    tracker.textContent = 'Tracking ' + open.length + ' open grant' + (open.length===1?'':'s');
+
+    if(closed.length){
+      archiveSec.style.display = '';
+      closedWrap.innerHTML = closed.map(closedCard).join('');
+      closedCount.textContent = closed.length + ' reopening';
+    }
+  }
+
   function jsonp(url){return new Promise(function(resolve){
-    var cb='__ngs'+Math.random().toString(36).slice(2);
+    var cb='__ngsg'+Math.random().toString(36).slice(2);
     var s=document.createElement('script');
     var timer=setTimeout(function(){cleanup();resolve(null);},9000);
     function cleanup(){clearTimeout(timer);delete window[cb];if(s.parentNode)s.remove();}
@@ -247,16 +263,16 @@
     s.src=url+(url.indexOf('?')>-1?'&':'?')+'callback='+cb;
     document.body.appendChild(s);
   });}
-  async function loadGrants(){
-    let data=SAMPLE_GRANTS;
+
+  async function load(){
+    let rows = SAMPLE;
     if(API_URL){
-      const d=await jsonp(API_URL+'?action=grants');
-      if(Array.isArray(d)) data = d;   // configured → show real feed (empty = empty state)
+      const d = await jsonp(API_URL+'?action=grants');
+      if(Array.isArray(d)) rows = d;   // null = failed → sample; [] = none yet → empty state
     }
-    feed.setAttribute('aria-busy','false');
-    feed.innerHTML=data.length?data.map(grantCard).join(''):`<div class="empty">No open programs listed right now — check back soon.</div>`;
+    render(rows);
   }
-  loadGrants();
+  load();
 </script>
 </body>
 </html>

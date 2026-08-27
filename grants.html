@@ -46,6 +46,11 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,191,191,.5)}70%{box-shadow:0 0 0 9px rgba(42,191,191,0)}100%{box-shadow:0 0 0 0 rgba(42,191,191,0)}}
   h1{font-size:clamp(30px,5vw,46px)}
   .tag{color:var(--muted);margin-top:10px;max-width:60ch;font-size:15px}
+  .headcta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:var(--teal);color:#04211f;
+           font-family:'DM Sans';font-weight:600;font-size:14px;padding:12px 20px;border-radius:10px}
+  .headcta:hover{background:#3ad2d2}
+  .headcta .arrow{transition:transform .2s;display:inline-block}
+  .headcta:hover .arrow{transform:translateX(3px)}
 
   /* Section headers */
   .sec{padding:34px 0 8px}
@@ -124,6 +129,7 @@
     <span class="status"><span class="dot" aria-hidden="true"></span><span class="label" id="tracker">Live grant tracker</span></span>
     <h1>Grants for the friends</h1>
     <p class="tag">Real funding, vetted and current. Browse what's open, apply directly to the funder — we take nothing and charge nothing to look. We update this as windows open and close.</p>
+    <a class="headcta" href="grant-intake.html">Get matched to grants <span class="arrow" aria-hidden="true">→</span></a>
   </div>
 </header>
 

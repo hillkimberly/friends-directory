@@ -158,6 +158,9 @@
      hint:"This shows on your listing card."},
     {key:'contact',type:'text',prompt:"How should guests reach you? (email, WhatsApp, or \u201cvia my site\u201d)",
      optional:true},
+     {key:'ownerEmail',type:'text',prompt:"What email should we use to reach YOU? This is private — just for your listing confirmation and updates, and never shown on your listing.",
+     validate:v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())||"Please enter a valid email so we can send your confirmation.",
+     hint:"We'll email you here the moment your listing goes live."},
     {key:'consent',type:'single',prompt:"Last thing — may we email you now and then with grant deadlines, workshops, and growth tips?",
      options:["Yes","No"],hint:"You'll be listed either way — this is just for occasional updates."}
   ];
@@ -262,7 +265,8 @@
       city:data.city||'',country:data.country||'',serves:data.serves||'',
       languages:(data.languages||[]).join(', '),website:data.website||'',
       referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||'',
-      referredByContact:data.referredByContact||'',consent:data.consent||''
+      referredByContact:data.referredByContact||'',consent:data.consent||'',
+      ownerEmail:data.ownerEmail||''
     };
     const finishUI=()=>{
       const c=document.createElement('div');c.className='done-card';

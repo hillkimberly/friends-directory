@@ -147,6 +147,9 @@
     {key:'languages',type:'multi',prompt:"Which languages can guests reach you in? Pick all that apply.",
      options:["English","Spanish","ASL","Other"],hint:"Tap all that apply, then tap Done. ASL is welcome here."},
     {key:'website',type:'text',prompt:"Do you have a website? Paste the link — or type \u201cnone\u201d if not yet.",
+        {key:'wantWebsite',type:'single',prompt:"Would you like help getting a website — or improving the one you have?",
+     options:["Yes, tell me more","No thanks"],
+     hint:"No pressure — just checking if it'd help."}, 	
      transform:v=>/^none$/i.test(v.trim())?"":v.trim()},
     {key:'referredBy',type:'text',prompt:"Which friend referred you in?",
      validate:v=>v.length>=2||"A referral keeps this directory by the friends, for the friends.",
@@ -158,8 +161,9 @@
      hint:"This shows on your listing card."},
     {key:'contact',type:'text',prompt:"How should guests reach you? (email, WhatsApp, or \u201cvia my site\u201d)",
      optional:true},
-     {key:'ownerEmail',type:'text',prompt:"What email should we use to reach YOU? This is private — just for your listing confirmation and updates, and never shown on your listing.",
-     validate:v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())||"Please enter a valid email so we can send your confirmation.",
+     {key:'ownerEmail',type:'text',prompt:"What email should we use to reach YOU? This is private — just for your listing confirmation and updates, and never shown on your listing. (No email? Type \u201cno email\u201d and we'll reach you another way.)",
+     validate:v=>{var t=v.trim();if(/^(no email|none|skip)$/i.test(t))return true;return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t)||"Please enter a valid email, or type \u201cno email\u201d.";},
+     transform:v=>/^(no email|none|skip)$/i.test(v.trim())?"":v.trim(),
      hint:"We'll email you here the moment your listing goes live."},
     {key:'consent',type:'single',prompt:"Last thing — may we email you now and then with grant deadlines, workshops, and growth tips?",
      options:["Yes","No"],hint:"You'll be listed either way — this is just for occasional updates."}
@@ -266,8 +270,7 @@
       languages:(data.languages||[]).join(', '),website:data.website||'',
       referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||'',
       referredByContact:data.referredByContact||'',consent:data.consent||'',
-      ownerEmail:data.ownerEmail||''
-    };
+      ownerEmail:data.ownerEmail||'',wantWebsite:data.wantWebsite||''
     const finishUI=()=>{
       const c=document.createElement('div');c.className='done-card';
       c.innerHTML='<h2>You\u2019re in the queue \u2705</h2><p style="color:var(--muted);font-size:14px;margin:0 0 14px">Need Greater Success reviews new listings and adds them once approved. You\u2019ll see it live on the directory soon.</p><a class="chip-done" style="display:inline-block;text-decoration:none" href="directory.html">Back to the directory</a>';

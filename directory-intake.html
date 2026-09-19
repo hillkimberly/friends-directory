@@ -160,8 +160,16 @@
     {key:'description',type:'text',prompt:"Describe your business in a sentence or two.",
      validate:v=>v.length>=10||"A little more detail helps guests understand what you offer.",
      hint:"This shows on your listing card."},
-    {key:'contact',type:'text',prompt:"How should guests reach you? (email, WhatsApp, or \u201cvia my site\u201d)",
-     optional:true},
+    {key:'contact1Method',type:'single',contactSlot:1,
+     prompt:"How should guests reach you? Pick your main method.",
+     options:["WhatsApp","Call","Text","Email","Instagram","Facebook","Skip \u2014 website only"],
+     hint:"This becomes a tap-to-contact button on your card."},
+    {key:'contact2Method',type:'single',contactSlot:2,
+     prompt:"Add another way to reach you? (optional)",
+     options:["WhatsApp","Call","Text","Email","Instagram","Facebook","No, that's all"]},
+    {key:'contact3Method',type:'single',contactSlot:3,
+     prompt:"One more? (optional)",
+     options:["WhatsApp","Call","Text","Email","Instagram","Facebook","No, that's all"]},
     {key:'ownerEmail',type:'text',prompt:"What email should we use to reach YOU? This is private — just for your listing confirmation and updates, and never shown on your listing. (No email? Type \u201cno email\u201d and we'll reach you another way.)",
      validate:v=>{var t=v.trim();if(/^(no email|none|skip)$/i.test(t))return true;return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t)||"Please enter a valid email, or type \u201cno email\u201d.";},
      transform:v=>/^(no email|none|skip)$/i.test(v.trim())?"":v.trim(),
@@ -188,7 +196,7 @@
       input.style.display='none';send.style.display='none';
       s.options.forEach(o=>{
         const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=o;
-        b.onclick=()=>{meSay(o);data[s.key]=o;step++;next();};
+        b.onclick=()=>{meSay(o);if(s.contactSlot){handleContactMethod(s,o);return;}data[s.key]=o;step++;next();};
         chips.appendChild(b);
       });
     } else if(s.type==='multi'){
@@ -235,6 +243,18 @@
     }
   }
 
+  function handleContactMethod(s,choice){
+    if(choice==="No, that's all" || choice.indexOf('Skip')===0){
+      steps=steps.filter(function(st,idx){return idx<=step || !st.contactSlot;});
+      step++;next();return;
+    }
+    data['contact'+s.contactSlot+'Type']=choice;
+    steps.splice(step+1,0,{key:'contact'+s.contactSlot+'Value',type:'text',
+      prompt:"Great \u2014 what's the "+choice+"? (number, address, or @handle)",
+      validate:function(v){return v.length>=3||('Please enter the '+choice+' details.');}});
+    step++;next();
+  }
+
   function submitText(){
     const s=steps[step];if(!s||s.type!=='text')return;
     let v=input.value.trim();
@@ -262,6 +282,9 @@
       if(c==='Other' && data.otherType) return 'Other: '+data.otherType;
       return c;
     });
+    var _c=[];
+    [1,2,3].forEach(function(n){var t=data['contact'+n+'Type'],v=data['contact'+n+'Value'];if(t&&v)_c.push({t:t,v:v});});
+    var _contactSummary=_c.map(function(x){return x.t+': '+x.v;}).join('; ');
     const payload={
       form:'directory-listing',
       status:'Pending',
@@ -269,9 +292,12 @@
       business:data.business||'',owner:data.owner||'',category:cats.join(', '),
       city:data.city||'',country:data.country||'',serves:data.serves||'',
       languages:(data.languages||[]).join(', '),website:data.website||'',
-      referredBy:data.referredBy||'',description:data.description||'',contact:data.contact||'',
+      referredBy:data.referredBy||'',description:data.description||'',contact:_contactSummary,
       referredByContact:data.referredByContact||'',consent:data.consent||'',
-      ownerEmail:data.ownerEmail||'',wantWebsite:data.wantWebsite||''
+      ownerEmail:data.ownerEmail||'',wantWebsite:data.wantWebsite||'',
+      contact1Type:(_c[0]&&_c[0].t)||'',contact1:(_c[0]&&_c[0].v)||'',
+      contact2Type:(_c[1]&&_c[1].t)||'',contact2:(_c[1]&&_c[1].v)||'',
+      contact3Type:(_c[2]&&_c[2].t)||'',contact3:(_c[2]&&_c[2].v)||''
     };
     const finishUI=()=>{
       const c=document.createElement('div');c.className='done-card';

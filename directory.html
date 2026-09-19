@@ -86,6 +86,10 @@
   .pill.asl{color:var(--gold);border-color:rgba(240,169,74,.45);background:rgba(240,169,74,.1)}
   .pill.lang{color:#c4cfe0}
   .flag-feat{font-family:'DM Mono';text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--gold)}
+  .contacts{display:flex;flex-wrap:wrap;gap:8px}
+  .cbtn{display:inline-flex;align-items:center;gap:7px;font-family:'DM Mono';text-transform:uppercase;letter-spacing:.08em;font-size:11px;padding:8px 12px;border-radius:9px;min-height:36px;border:1px solid rgba(42,191,191,.4);color:var(--teal);background:var(--teal-dim)}
+  .cbtn:hover{background:rgba(42,191,191,.2);border-color:var(--teal)}
+  .cbtn.rank1{border-color:var(--teal);background:rgba(42,191,191,.18)}
   .card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px}
   .visit{font-family:'DM Sans';font-weight:600;font-size:14px;color:var(--teal)}
   .visit .arrow{transition:transform .2s;display:inline-block}
@@ -190,6 +194,7 @@
     {name:"Health & Wellness",hint:"fitness, personal training, nutrition, massage, therapy"},
     {name:"Food & Catering",hint:"catering, baking, personal chef, food trucks"},
     {name:"Event Planning",hint:"events, weddings, travel planning, party rentals"},
+    {name:"Pet Services",hint:"grooming, pet sitting, boarding, animal care, wildlife rescue"},
     {name:"Professional Services",hint:"accounting, financial advising, grant writing, legal / paralegal, consulting"},
     {name:"Tech & Digital",hint:"web design, IT, automation, apps, AI services"},
     {name:"Creative & Media",hint:"photography, video, graphic design, advertising"},
@@ -243,11 +248,36 @@
     return 'https://' + u;                           // add https:// to bare domains
   }
 
+  function contactHref(type,value){
+    const t=String(type||'').toLowerCase().trim(), v=String(value||'').trim();
+    if(!v) return '';
+    const tel=v.replace(/[^\d+]/g,''); const wa=v.replace(/[^\d]/g,'');
+    if(t==='call'||t==='phone') return 'tel:'+tel;
+    if(t==='text'||t==='sms') return 'sms:'+tel;
+    if(t==='whatsapp') return 'https://wa.me/'+wa;
+    if(t==='email') return 'mailto:'+v;
+    if(t==='instagram') return 'https://instagram.com/'+v.replace(/^@/,'');
+    if(t==='facebook') return /^https?:/i.test(v)?v:'https://facebook.com/'+v.replace(/^@/,'');
+    if(t==='website') return fixUrl(v);
+    return fixUrl(v);
+  }
+  function contactLabel(type){
+    const t=String(type||'').toLowerCase().trim();
+    const map={call:'Call',phone:'Call',text:'Text',sms:'Text',whatsapp:'WhatsApp',email:'Email',instagram:'Instagram',facebook:'Facebook',website:'Website'};
+    return map[t]||(type||'Contact');
+  }
   function card(b){
     const langs = (b.languages||[]).map(l=>{
       const cls = l==='ASL' ? 'pill asl' : 'pill lang';
       return `<span class="${cls}">${esc(l)}</span>`;
     }).join('');
+    const contacts = Array.isArray(b.contacts)? b.contacts : [];
+    const cbtns = contacts.slice(0,3).map((c,i)=>{
+      const href = contactHref(c.type,c.value);
+      if(!href) return '';
+      return `<a class="cbtn${i===0?' rank1':''}" href="${esc(href)}" target="_blank" rel="noopener" aria-label="${esc(contactLabel(c.type))}: ${esc(c.value)}">${esc(contactLabel(c.type))}</a>`;
+    }).join('');
+    const contactsRow = cbtns ? `<div class="contacts">${cbtns}</div>` : '';
     const url = fixUrl(b.website);
     const site = url
       ? `<a class="visit" href="${esc(url)}" target="_blank" rel="noopener">Visit site <span class="arrow" aria-hidden="true">→</span></a>`
@@ -261,6 +291,7 @@
       <div class="loc" aria-label="Location">${esc(b.city)}${b.city&&b.country?', ':''}${esc(b.country)}</div>
       <p class="desc">${esc(b.description)}</p>
       <div class="pills"><span class="pill serves">${esc(b.serves||'—')}</span>${langs}</div>
+      ${contactsRow}
       <div class="card-foot">${site}</div>
     </article>`;
   }

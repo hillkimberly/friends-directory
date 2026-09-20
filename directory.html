@@ -111,9 +111,23 @@
   @media (prefers-reduced-motion:reduce){
     .dot{animation:none}.card{transition:none}.visit .arrow{transition:none}
   }
+  #gate{position:fixed;inset:0;z-index:50;background:var(--page);display:flex;align-items:center;justify-content:center;padding:20px}
+  .gatecard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center}
+  .gatecard input{width:100%;background:var(--card-alt);color:var(--text);border:1px solid var(--border-strong);border-radius:9px;padding:12px;font-family:'DM Sans',sans-serif;font-size:15px}
+  .gatecard input:focus{outline:2px solid var(--teal);outline-offset:2px}
 </style>
 </head>
 <body>
+<div id="gate" role="dialog" aria-modal="true" aria-label="Password required">
+  <form id="gateForm" class="gatecard">
+    <span class="label">The Friends Directory</span>
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;margin:8px 0 4px;font-size:22px">Friends only</h2>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 16px">Enter the password shared with you to view the directory.</p>
+    <input id="gatePass" type="password" autocomplete="off" placeholder="Password" aria-label="Password">
+    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px">Enter</button>
+    <div id="gateErr" role="alert" style="color:var(--coral);font-size:13px;min-height:16px;margin-top:10px"></div>
+  </form>
+</div>
 <a class="skip" href="#listings" style="position:absolute;left:-9999px">Skip to listings</a>
 
 <header>
@@ -186,6 +200,8 @@
 <script>
   // ── Paste your Apps Script Web App URL here (the /exec link). Leave blank to preview with sample data. ──
   const API_URL = "https://script.google.com/macros/s/AKfycbxxohDflp4MZ0-3hcNW9o5JPemJaYBVt9jP0CK12j3LIsaPhV0PgUO8kqdR_lA2Bplf/exec";
+  const API_KEY = "ngs-fd-7Qk29mZx4v";       // must match API_KEY in Code.gs
+  const SITE_PASSWORD = "Friends2026";      // the password you share with the friends
 
   const CATS = [
     {name:"Home & Trades",hint:"plumbing, electrical, handyman, landscaping"},
@@ -329,7 +345,7 @@
 
   async function load(){
     if(API_URL){
-      const d=await jsonp(API_URL+'?action=listings');
+      const d=await jsonp(API_URL+'?action=listings&key='+encodeURIComponent(API_KEY));
       DATA = Array.isArray(d) ? d : SAMPLE;   // null = load failed → sample; [] = no listings yet → empty state
     } else { DATA = SAMPLE; }
     // Legacy "Both" → "Local + online" so older rows still filter and display right.
@@ -341,7 +357,22 @@
   ['q','cat','serves','lang'].forEach(id=>{
     document.getElementById(id).addEventListener('input',render);
   });
-  load();
+  function revealSite(){
+    var g=document.getElementById('gate'); if(g) g.style.display='none';
+    try{ sessionStorage.setItem('ngs_dir_ok','1'); }catch(e){}
+    load();
+  }
+  (function(){
+    var ok=false; try{ ok=sessionStorage.getItem('ngs_dir_ok')==='1'; }catch(e){}
+    if(ok){ revealSite(); return; }
+    var f=document.getElementById('gateForm'), inp=document.getElementById('gatePass'), er=document.getElementById('gateErr');
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      if(inp.value===SITE_PASSWORD){ revealSite(); }
+      else{ er.textContent='That password doesn\u2019t match \u2014 ask the friend who shared this.'; inp.value=''; inp.focus(); }
+    });
+    inp.focus();
+  })();
 </script>
 </body>
 </html>
